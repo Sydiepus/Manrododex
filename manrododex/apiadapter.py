@@ -7,10 +7,9 @@ class ApiAdapter:
 
     def __int__(self, logger=None):
         self.logger = logger
-
-    @classmethod
-    def make_request(cls, method, url, passed_params=None, passed_headers=None):
-        req = cls.session.request(method, url, params=passed_params, headers=passed_headers)
+    # future me : Class methods are different -- they are called by a class, which is passed to the cls parameter of the method. (Sololearn) 
+    def make_request(self, method, url, passed_params=None, passed_headers=None):
+        req = self.session.request(method, url, params=passed_params, headers=passed_headers)
         if req.status_code == 200:
             try:
                 return req.json()
