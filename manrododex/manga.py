@@ -1,7 +1,9 @@
 import re
 import logging
+import manrododex.http as http
 
-api_url = "https://api.mangadex.org/manga"
+
+API_URL = "https://api.mangadex.org/manga"
 
 class Manga:
     """The Manga uhh...yeah
@@ -20,10 +22,13 @@ class Manga:
             self.uuid = re.search("[^/]+-[^/]+-[^/]+-[^/]+-[^/]+", url_uuid).group()
         except AttributeError:
             self.uuid = None
-        self.name = name
-        self.desc = None
-        self.status = None
-        self.langs = None
+            # TODO: if uuid is 'None' execution cannot proceed.
+        else:
+            self.name = name
+            self.desc = None
+            self.status = None
+            self.langs = None
 
     def _get_info(self):
+        request = http.get(f"{API_URL}/{self.uuid}")
 
