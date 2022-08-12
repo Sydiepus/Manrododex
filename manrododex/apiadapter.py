@@ -1,8 +1,8 @@
-import requests
-from requests import JSONDecodeError
-from requests.adapters import HTTPAdapter
-from urllib3 import Retry
 import logging
+
+import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 API_URL = "https://api.mangadex.org"
 

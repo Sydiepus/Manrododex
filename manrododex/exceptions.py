@@ -1,0 +1,2 @@
+class NoneUUID(Exception):
+    pass

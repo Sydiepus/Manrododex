@@ -1,6 +1,8 @@
-import re
-from manrododex.apiadapter import ApiAdapter
 import logging
+import re
+
+from manrododex.apiadapter import ApiAdapter
+from manrododex.exceptions import NoneUUID
 
 MANGA_ENDPOINT = "/manga"
 
@@ -24,14 +26,14 @@ class Manga:
         except AttributeError:
             logging.critical("Failed to extract uuid skipping.")
             self.uuid = None
-            # TODO: if uuid is 'None' execution cannot proceed.
+            raise NoneUUID("Failed to get uuid, execution cannot proceed.")
         else:
             self.name = name
             self.desc = None
             self.status = None
             self.langs = None
 
-    def _get_info(self):
+    def get_info(self):
         response = ApiAdapter.make_request("get", f"{MANGA_ENDPOINT}/{self.uuid}")
         print(response)
 
