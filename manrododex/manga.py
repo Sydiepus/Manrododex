@@ -1,9 +1,9 @@
 import re
+from manrododex.apiadapter import ApiAdapter
 import logging
-import manrododex.http as http
 
+MANGA_ENDPOINT = "/manga"
 
-API_URL = "https://api.mangadex.org/manga"
 
 class Manga:
     """The Manga uhh...yeah
@@ -20,7 +20,9 @@ class Manga:
         try:
             # get only the uuid
             self.uuid = re.search("[^/]+-[^/]+-[^/]+-[^/]+-[^/]+", url_uuid).group()
+            logging.debug("the uuid extracted is : %s", self.uuid)
         except AttributeError:
+            logging.critical("Failed to extract uuid skipping.")
             self.uuid = None
             # TODO: if uuid is 'None' execution cannot proceed.
         else:
@@ -30,5 +32,6 @@ class Manga:
             self.langs = None
 
     def _get_info(self):
-        request = http.get(f"{API_URL}/{self.uuid}")
+        response = ApiAdapter.make_request("get", f"{MANGA_ENDPOINT}/{self.uuid}")
+        print(response)
 
