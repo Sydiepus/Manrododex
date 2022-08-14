@@ -4,6 +4,8 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
+from manrododex.exceptions import ResultNotOk
+
 API_URL = "https://api.mangadex.org"
 
 
@@ -26,7 +28,10 @@ class ApiAdapter:
         if req.status_code == 200:
             logging.debug("Request successful.")
             try:
-                return req.json()
+                if req.json().get("result") == "ok":
+                    return req.json()["data"]
+                else:
+                    raise ResultNotOk("Received response is invalid.")
             except JSONDecodeError:
                 logging.error("Failed to decode json.")
                 return None
