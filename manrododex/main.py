@@ -6,16 +6,13 @@ from manrododex.manga import Manga
 def main(url_uuid, title_settings, lang, log_level):
     logger.init(log_level)
     try:
-        manga = Manga(url_uuid, title_settings, lang)
-    except NoneUUID:
+        manga = Manga(url_uuid, lang)
+        # Make the request to get basic info about the manga.
+        manga.get_info(title_settings)
+        # Make the requests to get the available chapters.
+        manga.get_chapters()
+    except (NoneUUID, LangNotAvail):
         return 1
-    # Make the request to get basic info about the manga.
-    try:
-        manga.get_info()
-    except LangNotAvail:
-        return 1
-    # Make the requests to get the available chapters.
-    manga.get_chapters()
 
     return 0
 

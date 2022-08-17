@@ -45,7 +45,32 @@ class Manga:
     -------------
     url_uuid:
         The url or the uuid of the manga that needs to be fetched.
-    title_settings :
+    lang:
+        the language code in which the user wants to download the
+        manga.
+    """
+
+    def __init__(self, url_uuid, lang):
+        try:
+            self.uuid = re.search(GUID_REGEX, url_uuid).group()
+            logging.debug("the uuid extracted is : %s", self.uuid)
+        except AttributeError:
+            logging.critical("Failed to extract uuid skipping.")
+            self.uuid = None
+            raise NoneUUID("Failed to get uuid, execution cannot proceed.")
+        else:
+            self.info = dict()
+            self.lang = lang
+            self.chapters = None
+            logging.info("Manga created with no errors.")
+
+    def get_info(self, title_settings):
+        """Gets more info about the manga, like:
+        title, altTitles, description, status, availableTranslatedLanguages, year, contentRating
+
+        Parameters:
+        ------------
+        title_settings :
         A tuple that contains 3 elements:
             The first:
                 Type: str
@@ -60,26 +85,8 @@ class Manga:
                 Description: force the usage of the default title - the one you see on the website - regardless of the
                 language specified.
                 Default: True
-    lang:
-        the language code in which the user wants to download the
-        manga.
-    """
 
-    def __init__(self, url_uuid, title_settings, lang):
-        try:
-            self.uuid = re.search(GUID_REGEX, url_uuid).group()
-            logging.debug("the uuid extracted is : %s", self.uuid)
-        except AttributeError:
-            logging.critical("Failed to extract uuid skipping.")
-            self.uuid = None
-            raise NoneUUID("Failed to get uuid, execution cannot proceed.")
-        else:
-            self.info = dict()
-            self.lang = lang
-            self.title_settings = title_settings
-
-    def get_info(self):
-        """Expected response a dictionary with the following keys that interests us:
+        Expected response a dictionary with the following keys that interests us:
         title: dict
         altTitles: list containing a dict
         description: dict
@@ -88,6 +95,7 @@ class Manga:
         year: int
         contentRating: str
         """
+
         info = ApiAdapter.make_request("get", f"{MANGA_ENDPOINT}/{self.uuid}")["data"]["attributes"]
         logging.debug("Checking if requested language is available.")
         avl_langs = info["availableTranslatedLanguages"]
@@ -95,14 +103,15 @@ class Manga:
             logging.critical("Language not available skipping.")
             raise LangNotAvail("Requested language not available for this manga.")
         del avl_langs
-        self.info["title"] = _handle_title(self.title_settings, info["title"], info["altTitles"])
-        del self.title_settings
+        self.info["title"] = _handle_title(title_settings, info["title"], info["altTitles"])
+        del title_settings
         self.info["desc"] = info["description"][self.lang]
         logging.debug("Using description with language %s", self.lang)
         self.info["status"] = info["status"]
         self.info["year"] = info["year"]
         self.info["contentRating"] = info["contentRating"]
         logging.info("All info fetched successfully.")
+
         # Taking a break committing to be safe.
         # Note so I don't forget.
         # chapters SimpleQueue since only image downloading should be threaded.
