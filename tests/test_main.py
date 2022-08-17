@@ -4,9 +4,11 @@ import tests
 from manrododex.main import main
 
 uuid_url = tests.uuid_urls
+ex_resp = tests.ex_resp_main
+param = [(u, v) for u, v in zip(uuid_url, ex_resp)]
 
 
-@pytest.mark.parametrize("uuid_url_p", uuid_url)
-def test_main(uuid_url_p):
-    maiden = main(uuid_url_p, None, None)
-    assert maiden is None
+@pytest.mark.parametrize("uuid_url_p,ex_resp", param)
+def test_main(uuid_url_p, ex_resp):
+    maiden = main(uuid_url_p, (None, "en", True), "en", "DEBUG")
+    assert maiden is ex_resp

@@ -4,3 +4,7 @@ class NoneUUID(Exception):
 
 class ResultNotOk(Exception):
     pass
+
+
+class LangNotAvail(Exception):
+    pass
