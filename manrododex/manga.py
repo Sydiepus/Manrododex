@@ -88,7 +88,7 @@ class Manga:
         year: int
         contentRating: str
         """
-        info = ApiAdapter.make_request("get", f"{MANGA_ENDPOINT}/{self.uuid}")["attributes"]
+        info = ApiAdapter.make_request("get", f"{MANGA_ENDPOINT}/{self.uuid}")["data"]["attributes"]
         logging.debug("Checking if requested language is available.")
         avl_langs = info["availableTranslatedLanguages"]
         if self.lang not in avl_langs:
@@ -108,3 +108,10 @@ class Manga:
         # chapters SimpleQueue since only image downloading should be threaded.
         # images Queue for threading.
         # not sure if this is right.
+
+    def get_chapters(self):
+        r = ApiAdapter.make_request("get",
+                                    f"{MANGA_ENDPOINT}/{self.uuid}/aggregate",
+                                    passed_params={
+                                        "translatedLanguage[]": f"{self.lang}"
+                                    })["volumes"]

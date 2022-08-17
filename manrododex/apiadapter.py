@@ -1,6 +1,7 @@
 import logging
 
 import requests
+from requests import JSONDecodeError
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
@@ -29,7 +30,7 @@ class ApiAdapter:
             logging.debug("Request successful.")
             try:
                 if req.json().get("result") == "ok":
-                    return req.json()["data"]
+                    return req.json()
                 else:
                     raise ResultNotOk("Received response is invalid.")
             except JSONDecodeError:
