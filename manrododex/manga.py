@@ -23,7 +23,7 @@ def _handle_title(title_settings, info_title, info_alttitles):
         if title_settings[-1]:
             title = _get_default_title(info_title)
         else:
-            logging.debug("Using alternative title with language %s", title_settings[1])
+            logging.debug("Using alternative title with language '%s'", title_settings[1])
             for i in info_alttitles:
                 try:
                     title = i[title_settings[1]]
@@ -31,12 +31,12 @@ def _handle_title(title_settings, info_title, info_alttitles):
                 except KeyError:
                     continue
             if not title:
-                logging.debug("No altTitle found for %s using default one.", title_settings[1])
+                logging.debug("No altTitle found for '%s' using default one.", title_settings[1])
                 title = _get_default_title(info_title)
         logging.debug("Manga title set successfully.")
     else:
         logging.debug("Manga title already given not changing it.")
-    logging.debug("Name to be used %s", title)
+    logging.debug("Name to be used '%s'", title)
     return title
 
 
@@ -75,7 +75,7 @@ def _gen_list(selected_chapters):
     for entry in selected_chapters.strip().split(","):
         try:
             vol_match = re.search("v((([0-9])+/([0-9])+)|([0-9]+))v", entry).group()
-            logging.debug("entry successfully matched.")
+            logging.debug("Entry successfully matched.")
             vol_gen = vol_match.strip("v")
             chap_gen = entry.replace(vol_match, "")
         except AttributeError:
@@ -144,7 +144,7 @@ class Manga:
     def __init__(self, url_uuid, lang):
         try:
             self.uuid = re.search(GUID_REGEX, url_uuid).group()
-            logging.debug("the uuid extracted is : %s", self.uuid)
+            logging.debug("the uuid extracted is : '%s'", self.uuid)
         except AttributeError:
             logging.critical("Failed to extract uuid skipping.")
             self.uuid = None
@@ -197,7 +197,7 @@ class Manga:
         self.info["title"] = _handle_title(title_settings, info["title"], info["altTitles"])
         del title_settings
         self.info["desc"] = info["description"][self.lang]
-        logging.debug("Using description with language %s", self.lang)
+        logging.debug("Using description with language '%s'", self.lang)
         self.info["status"] = info["status"]
         self.info["year"] = info["year"]
         self.info["contentRating"] = info["contentRating"]

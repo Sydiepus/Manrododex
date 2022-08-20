@@ -1,4 +1,5 @@
 import logging
+from time import sleep, time
 
 import requests
 from requests import JSONDecodeError
@@ -8,6 +9,27 @@ from urllib3.util.retry import Retry
 from manrododex.exceptions import ResultNotOk
 
 API_URL = "https://api.mangadex.org"
+
+last_time = None
+
+
+def can_i_mauwku_requesto_senpai():
+    global last_time
+    current_time = time()
+    if last_time:
+        delta = current_time - last_time
+        logging.debug("Time since last request '%s'", str(delta))
+        if delta >= 0.2:
+            return
+        else:
+            sleep_for = 0.2 - delta
+            logging.debug("Waiting '%s'", str(sleep_for))
+            sleep(sleep_for)
+            last_time = current_time
+            return
+    else:
+        last_time = current_time
+        return
 
 
 class ApiAdapter:
@@ -25,6 +47,7 @@ class ApiAdapter:
     # the method. (Sololearn)
     @classmethod
     def make_request(cls, method, endpoint, passed_params=None, passed_headers=None):
+        can_i_mauwku_requesto_senpai()
         req = cls.session.request(method, f"{API_URL}{endpoint}", params=passed_params, headers=passed_headers)
         if req.status_code == 200:
             logging.debug("Request successful.")
