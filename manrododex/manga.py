@@ -42,12 +42,16 @@ def _handle_title(title_settings, info_title, info_alttitles):
 
 def _gen_helper(var_gen):
     gen = None
-    if var_gen:
+    if var_gen and re.search("((([0-9])+/([0-9])+)|([0-9]+))", var_gen):
         if "/" in var_gen:
+            logging.debug("Generating range.")
             to_gen = var_gen.split("/")
             if int(to_gen[0]) < int(to_gen[-1]):
                 gen = [str(i) for i in range(int(to_gen[0]), int(to_gen[-1]) + 1)]
+                logging.debug("Range successfully generated.")
             else:
+                logging.debug("Failed to generate range, are you sure the range is in ascending order from left to "
+                              "right ?")
                 gen = None
         else:
             gen = var_gen
@@ -62,37 +66,67 @@ def _gen_list(selected_chapters):
                 '/' to make a range.
                 ',' to start a new rule.
             e.g: v7v99 would be volume 7 chapter 99.
-                 v1/3v1 would be chapter one from vol 1, 2 and 3.
-                 1,4,6 would download chapter 1, 2 and 3 it assumes that no volume set aka 'None'.
+                 v1/3v1 would be chapter 1 from vol 1, 2 and 3.
+                 1,4,6 would download chapter 1, 4 and 6 regardless for the volume.
                  v6v would download volume 6 entirely.
                  """
     vol = list()
     chap = list()
     for entry in selected_chapters.strip().split(","):
         try:
-            vol_match = re.search("v[0-9]*/?[0-9]*v", entry).group()
+            vol_match = re.search("v((([0-9])+/([0-9])+)|([0-9]+))v", entry).group()
+            logging.debug("entry successfully matched.")
             vol_gen = vol_match.strip("v")
             chap_gen = entry.replace(vol_match, "")
         except AttributeError:
+            logging.debug("Entry did not match, defaulting to all volumes.")
             vol_gen = None
             chap_gen = entry
         vol_a = _gen_helper(vol_gen)
         chap_a = _gen_helper(chap_gen)
-        vol.extend(vol_a) if type(vol_a) == list else vol.append(vol_a)
-        chap.extend(chap_a) if type(vol_a) == list else chap.append(chap_a)
-    generated = (sorted(list(set(vol))), sorted(chap))
-    return generated
+        vol.extend(vol_a) if type(vol_a) is list else vol.append(vol_a)
+        chap.extend(chap_a) if type(chap_a) is list else chap.append(chap_a)
+    vol = sorted(list(set(vol)))
+    chap = sorted(chap)
+    logging.debug("vol/chap list successfully generated.")
+    return vol, chap
 
 
 def _check_ext_url(chap_id):
     """check whether the chapter have an external URL or not.
         True means yes it have an external URL.
         False for no."""
+    logging.debug("Checking for external url.")
     info = ApiAdapter.make_request("get", f"{CHAPTER_ENDPOINT}/{chap_id}")["data"]
     if info["attributes"]["externalUrl"] == "null":
+        logging.debug("external url found.")
         return True
     else:
+        logging.debug("external url not found.")
         return False
+
+
+def _get_vol_list(info):
+    return list(reversed(info.keys()))  # list from last to first volume this is why I reversed it.
+
+
+def _get_chap_list(info, volumes_list):
+    chapters_complete = list()
+    for volume in volumes_list:
+        chapters = info[volume]["chapters"]
+        # workaround for f6e7ce00-e09c-4ed2-b806-eb2fdc7a5f60
+        if type(chapters) is dict:
+            chapters_list = list(reversed(chapters.keys()))
+            chapters_complete.extend(chapters_list)
+        else:
+            continue
+    return chapters_complete
+
+
+def _get_vol_chap_list(info):
+    volumes_list = _get_vol_list(info)
+    chapters_complete = _get_chap_list(info, volumes_list)
+    return volumes_list, chapters_complete
 
 
 class Manga:
@@ -169,11 +203,31 @@ class Manga:
         self.info["contentRating"] = info["contentRating"]
         logging.info("All info fetched successfully.")
 
-        # Taking a break committing to be safe.
-        # Note so I don't forget.
-        # chapters SimpleQueue since only image downloading should be threaded.
-        # images Queue for threading.
-        # not sure if this is right.
+    def _chapters_to_queue(self, vol_list, chap_list, info):
+        for vol in vol_list:
+            try:
+                vol_tmp = info[vol]
+                for chap in chap_list:
+                    try:
+                        chap_tmp = vol_tmp["chapters"][chap]
+                        chap_id = None
+                        if chap_tmp["count"] != 1 and _check_ext_url(chap_tmp["id"]):
+                            for id_o in chap_tmp["others"]:
+                                if not _check_ext_url(id_o):
+                                    chap_id = id_o
+                                    break
+                        else:
+                            chap_id = chap_tmp["id"]
+                        if chap_id:
+                            self.chapters.put((vol, chap, chap_id))
+                            logging.debug("Item successfully added to queue.")
+                        else:
+                            logging.debug("no chapter id found skipping.")
+                            continue
+                    except KeyError:
+                        continue
+            except KeyError:
+                continue
 
     def get_chapters(self, selected_vol_chap):
         info = ApiAdapter.make_request("get",
@@ -181,29 +235,26 @@ class Manga:
                                        passed_params={
                                            "translatedLanguage[]": f"{self.lang}"
                                        })["volumes"]
+        # not sure if it's supposed to be fetch or download.
         if selected_vol_chap:
-            chap_to_fetch = _gen_list(selected_vol_chap)
-            for vol in chap_to_fetch[0]:
-                try:
-                    vol_tmp = info[vol]
-                    for chap in chap_to_fetch[-1]:
-                        try:
-                            chap_tmp = vol_tmp["chapters"][chap]
-                            chap_id = None
-                            if chap_tmp["count"] != 1 and _check_ext_url(chap_tmp["id"]):
-                                for id_o in chap_tmp["others"]:
-                                    if not _check_ext_url(id_o):
-                                        chap_id = id_o
-                                        break
-                            else:
-                                chap_id = chap_tmp["id"]
-                            if chap_id:
-                                self.chapters.put((vol, chap, chap_id))
-                            else:
-                                continue
-                        except KeyError:
-                            continue
-                except KeyError:
-                    continue
+            logging.debug("Using user provided vol/chapters.")
+            vol_list, chap_list = _gen_list(selected_vol_chap)
+            del selected_vol_chap
+            if len(vol_list) == len(chap_list) == 1 and vol_list[0] is chap_list[0] is None:
+                # if both are None Download everything.
+                logging.debug("Something with the generated vol/chap using all vol/chap.")
+                vol_list, chap_list = _get_vol_chap_list(info)
+            elif len(vol_list) == 1 and not vol_list[0]:
+                # if volume is only None download all volumes and respect user given chapters.
+                logging.debug("Using all vol and user given chap.")
+                vol_list = _get_vol_list(info)
+            elif len(chap_list) == 1 and not chap_list[0]:
+                # if chapters is only None download all chapters and respect user given volumes.
+                logging.debug("Using user given vol and downloading all chapters.")
+                chap_list = _get_chap_list(info, vol_list)
+            self._chapters_to_queue(vol_list, chap_list, info)
         else:
-            pass
+            logging.debug("Using all volumes and chapters.")
+            vol_list, chap_list = _get_vol_chap_list(info)
+            self._chapters_to_queue(vol_list, chap_list, info)
+        logging.info("All chapters have been fetched and ready for the next step.")

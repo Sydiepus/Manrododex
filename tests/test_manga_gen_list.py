@@ -10,5 +10,5 @@ param = [(u, v) for u, v in zip(gen, ex_gen)]
 
 @pytest.mark.parametrize("genf,ex_genf", param)
 def test__gen_list(genf, ex_genf):
-    res = _gen_list(genf)
-    assert res == ex_genf
+    vol, chap = _gen_list(genf)
+    assert (vol, chap) == ex_genf

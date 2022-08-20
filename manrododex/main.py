@@ -18,4 +18,4 @@ def main(url_uuid, title_settings, lang, selected_vol_chap, log_level):
 
 
 if __name__ == "__main__":
-    main("b98c4daf-be1a-46c8-ad83-21d532995240", (None, None, True), "en", "DEBUG")
+    main("52829b03-4675-4a1e-a4be-742436a6e306", (None, None, True), "en", "v1v", "DEBUG")
