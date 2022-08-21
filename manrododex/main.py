@@ -3,7 +3,7 @@ from manrododex.exceptions import NoneUUID, LangNotAvail
 from manrododex.manga import Manga
 
 
-def main(url_uuid, title_settings, lang, selected_vol_chap, log_level):
+def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, log_level):
     logger.init(log_level)
     try:
         manga = Manga(url_uuid, lang)

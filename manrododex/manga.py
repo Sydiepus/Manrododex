@@ -2,8 +2,8 @@ import logging
 import re
 
 from manrododex.apiadapter import ApiAdapter
-from manrododex.chapters import Chapters
 from manrododex.exceptions import NoneUUID, LangNotAvail
+from manrododex.manga_helpers import Chapters
 
 MANGA_ENDPOINT = "/manga"
 CHAPTER_ENDPOINT = "/chapter"
@@ -230,6 +230,8 @@ class Manga:
                 continue
 
     def get_chapters(self, selected_vol_chap):
+        """Make the request to get chapters by language and add them to the chapters SimpleQueue in the following
+        format: (vol, chap, chap_id)"""
         info = ApiAdapter.make_request("get",
                                        f"{MANGA_ENDPOINT}/{self.uuid}/aggregate",
                                        passed_params={
