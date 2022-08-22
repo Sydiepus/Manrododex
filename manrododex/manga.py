@@ -42,7 +42,7 @@ def _handle_title(title_settings, info_title, info_alttitles):
 
 def _gen_helper(var_gen):
     gen = None
-    if var_gen and re.search("((([0-9])+/([0-9])+)|([0-9]+))", var_gen):
+    if var_gen and re.search("(([0-9]+)/([0-9]+))|([0-9]+)", var_gen):
         if "/" in var_gen:
             logging.debug("Generating range.")
             to_gen = var_gen.split("/")
@@ -74,7 +74,7 @@ def _gen_list(selected_chapters):
     chap = list()
     for entry in selected_chapters.strip().split(","):
         try:
-            vol_match = re.search("v((([0-9])+/([0-9])+)|([0-9]+))v", entry).group()
+            vol_match = re.search("v((([0-9]+)/([0-9]+))|([0-9]+))v", entry).group()
             logging.debug("Entry successfully matched.")
             vol_gen = vol_match.strip("v")
             chap_gen = entry.replace(vol_match, "")
