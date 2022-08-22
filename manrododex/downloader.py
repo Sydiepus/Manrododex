@@ -1,7 +1,19 @@
+import re
+
 from manrododex.apiadapter import ApiAdapter
 from manrododex.manga_helpers import Images
 
 AT_HOME_SERVER_ENDPOINT = "/at-home/server"
+
+
+def chapter_archive_name(vol, chap):
+    if vol != "none":
+        chapter_name = f"vol-{vol}-chapter-{chap}"
+    elif chap == "Oneshot":
+        chapter_name = chap
+    else:
+        chapter_name = f"chapter-{chap}"
+    return chapter_name
 
 
 class Downloader:
@@ -42,3 +54,14 @@ class Downloader:
         images = info["chapter"]["dataSaver"] if self.quality == "data-saver" else info["chapter"]["data"]
         for image in images:
             self.images.put(f"{base_url}/{self.quality}/{chapter_hash}/{image}")
+
+    def download_image(self, sys_helper):
+        img_link = self.images.get()
+        img_name = re.search("(x?)([0-9]+)(-)", img_link).group(2)
+        img_ext = re.search("(-)(.*)(\..*$)", img_link).group(3)
+        img_path = sys_helper.forge_img_path(img_name, img_ext)
+
+    def main(self, sys_helper):
+        self.build_images_link()
+        chapter_name = chapter_archive_name(self.volume, self.chapter)
+        sys_helper.create_chapter_dir(chapter_name)
