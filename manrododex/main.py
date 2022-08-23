@@ -23,7 +23,7 @@ import pathlib
 
 import manrododex.logger as logger
 from manrododex.downloader import Downloader
-from manrododex.exceptions import NoneUUID, LangNotAvail
+from manrododex.exceptions import NoneUUID, LangNotAvail, RequestDidNotSucceed
 from manrododex.manga import Manga
 from manrododex.system_helper import SysHelper
 
@@ -83,7 +83,7 @@ def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, quality, 
         # We can now start downloading.
         downloader = Downloader(manga, quality, threads, force_ssl)
         downloader.main(sys_helper)
-    except (NoneUUID, LangNotAvail):
+    except (NoneUUID, LangNotAvail, RequestDidNotSucceed):
         return 1
 
     return 0
