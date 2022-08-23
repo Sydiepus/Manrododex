@@ -19,7 +19,11 @@
 #  SOFTWARE.
 
 from os import path, makedirs
-from shutil import make_archive
+from shutil import make_archive, rmtree
+
+
+def path_exits(given_path):
+    return path.exists(given_path)
 
 
 class SysHelper:
@@ -45,5 +49,6 @@ class SysHelper:
     def forge_img_path(self, img_name, img_ext):
         return path.join(self.chapter_path, f"{img_name}{img_ext}")
 
-    def archive_chapter(self, chapter_name):
-        make_archive(chapter_name, self.archive_format, self.manga_path, self.chapter_path)
+    def archive_chapter(self):
+        make_archive(self.chapter_path, self.archive_format, root_dir=self.chapter_path)
+        rmtree(self.chapter_path)

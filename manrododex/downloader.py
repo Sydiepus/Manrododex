@@ -22,6 +22,7 @@ import re
 
 from manrododex.apiadapter import ApiAdapter
 from manrododex.manga_helpers import Images
+from manrododex.system_helper import path_exits
 
 AT_HOME_SERVER_ENDPOINT = "/at-home/server"
 
@@ -65,9 +66,9 @@ class Downloader:
         self.volume = chapter[0]
         self.chapter = chapter[1]
         info = ApiAdapter.make_request("get",
-                                       f"{AT_HOME_SERVER_ENDPOINT}/f{chapter[-1]}",
+                                       f"{AT_HOME_SERVER_ENDPOINT}/{chapter[2]}",
                                        passed_params={
-                                           "forcePort443": f"{self.force_ssl}"
+                                           "forcePort443": self.force_ssl
                                        })
         base_url = info["baseUrl"]
         chapter_hash = info["chapter"]["hash"]
@@ -80,6 +81,8 @@ class Downloader:
         img_name = re.search("(x?)([0-9]+)(-)", img_link).group(2)
         img_ext = re.search("(-)(.*)(\..*$)", img_link).group(3)
         img_path = sys_helper.forge_img_path(img_name, img_ext)
+        if path_exits(img_path):
+            return
         img = ApiAdapter.img_download(img_link)
         with open(img_path, "wb") as f:
             f.write(img.content)
@@ -88,6 +91,7 @@ class Downloader:
         self.build_images_link()
         chapter_name = chapter_archive_name(self.volume, self.chapter)
         sys_helper.create_chapter_dir(chapter_name)
+        del chapter_name
         while not self.images.empty():
             self.download_image(sys_helper)
-        sys_helper.archive_chapter(chapter_name)
+        sys_helper.archive_chapter()
