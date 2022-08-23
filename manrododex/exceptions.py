@@ -28,3 +28,7 @@ class ResultNotOk(Exception):
 
 class LangNotAvail(Exception):
     pass
+
+
+class RequestDidNotSucceed(Exception):
+    pass
