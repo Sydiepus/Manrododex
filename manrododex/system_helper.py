@@ -19,13 +19,15 @@
 #  SOFTWARE.
 
 from os import path, makedirs
+from shutil import make_archive
 
 
 class SysHelper:
-    def __init__(self, main_path, manga_title):
+    def __init__(self, main_path, manga_title, archive_format):
         self.main_path = main_path
         self.manga_path = path.join(self.main_path, manga_title)
         self.chapter_path = None
+        self.archive_format = archive_format
 
     def create_main_manga_dir(self):
         if not path.exists(self.main_path):
@@ -42,3 +44,6 @@ class SysHelper:
 
     def forge_img_path(self, img_name, img_ext):
         return path.join(self.chapter_path, f"{img_name}{img_ext}")
+
+    def archive_chapter(self, chapter_name):
+        make_archive(chapter_name, self.archive_format, self.manga_path, self.chapter_path)

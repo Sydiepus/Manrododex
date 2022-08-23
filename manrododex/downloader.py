@@ -80,8 +80,14 @@ class Downloader:
         img_name = re.search("(x?)([0-9]+)(-)", img_link).group(2)
         img_ext = re.search("(-)(.*)(\..*$)", img_link).group(3)
         img_path = sys_helper.forge_img_path(img_name, img_ext)
+        img = ApiAdapter.img_download(img_link)
+        with open(img_path, "wb") as f:
+            f.write(img.content)
 
     def main(self, sys_helper):
         self.build_images_link()
         chapter_name = chapter_archive_name(self.volume, self.chapter)
         sys_helper.create_chapter_dir(chapter_name)
+        while not self.images.empty():
+            self.download_image(sys_helper)
+        sys_helper.archive_chapter(chapter_name)

@@ -19,6 +19,7 @@
 #  SOFTWARE.
 
 import logging
+import re
 from time import sleep, time
 
 import requests
@@ -29,6 +30,7 @@ from urllib3.util.retry import Retry
 from manrododex.exceptions import ResultNotOk
 
 API_URL = "https://api.mangadex.org"
+REPORT_ENDPOINT_URL = "https://api.mangadex.network/report"
 
 
 class ApiAdapter:
@@ -80,3 +82,36 @@ class ApiAdapter:
         else:
             logging.error("Failed to make request.")
             return None
+
+    @classmethod
+    def img_download(cls, img_link):
+        should_report = True if not re.search(".*(\.?mangadex.org).*", img_link) else False
+        cls.can_i_mauwku_requesto_senpai()
+        if should_report:
+            start_time = time()
+        req = cls.session.request("get", img_link)
+        success = req.status_code == 200
+        try:
+            cached = True if "HIT" in req.headers["X-Cache"] else False
+        except KeyError:
+            cached = False
+        if should_report:
+            stop_time = time()
+            # The time function returns the time in seconds.
+            # Mangadex wants it in milliseconds.
+            duration = int((stop_time - start_time) * 1000)
+            data = {
+                "url": img_link,
+                "success": success,
+                "cached": cached,
+                "bytes": len(req.content),
+                "duration": duration
+            }
+            header = {
+                "content-type": "application/json"
+            }
+            # report
+            cls.session.request("post", REPORT_ENDPOINT_URL, params=data, headers=header)
+        if success:
+            logging.debug("Request successful.")
+            return req

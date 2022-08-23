@@ -26,7 +26,7 @@ from manrododex.manga import Manga
 from manrododex.system_helper import SysHelper
 
 
-def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, log_level):
+def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, archive_format, log_level):
     """A comment to keep track of the parameters.
     Parameters:
     ------------
@@ -45,6 +45,9 @@ def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, log_level
     main_path:
         type: str/path
         default: current working dir + 'Manga'
+    archive_format:
+        type: str
+        default: cbz
     log_level:
         type: str
         default: INFO
@@ -57,7 +60,7 @@ def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, log_level
         # Make the requests to get the available chapters.
         manga.get_chapters(selected_vol_chap)
         # It's now time to download the manga.
-        sys_helper = SysHelper(main_path, manga.info["title"])
+        sys_helper = SysHelper(main_path, manga.info["title"], archive_format)
         # First create the main manga directory where the manga need to be put.
         sys_helper.create_main_manga_dir()
         # Then we create the directory for the manga that have the manga title as name.
@@ -71,4 +74,4 @@ def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, log_level
 # TODO: remove this before merging with main.
 if __name__ == "__main__":
     main("52829b03-4675-4a1e-a4be-742436a6e306", (None, None, True), "en", "v1v",
-         str(pathlib.Path().resolve().absolute()), "DEBUG")
+         str(pathlib.Path().resolve().absolute()), "zip", "DEBUG")
