@@ -18,15 +18,18 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
+import os
 import pathlib
 
 import manrododex.logger as logger
+from manrododex.downloader import Downloader
 from manrododex.exceptions import NoneUUID, LangNotAvail
 from manrododex.manga import Manga
 from manrododex.system_helper import SysHelper
 
 
-def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, archive_format, log_level):
+def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, quality, threads, force_ssl, archive_format,
+         log_level):
     """A comment to keep track of the parameters.
     Parameters:
     ------------
@@ -45,9 +48,21 @@ def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, archive_f
     main_path:
         type: str/path
         default: current working dir + 'Manga'
+    quality:
+        type: str
+        default: data
+        other option(s): data-saver
+    threads:
+        type: int
+        default: 0
+    force_ssl:
+        type: bool
+        default False
+        other option(s): True
     archive_format:
         type: str
         default: cbz
+        other option(s): zip
     log_level:
         type: str
         default: INFO
@@ -65,6 +80,9 @@ def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, archive_f
         sys_helper.create_main_manga_dir()
         # Then we create the directory for the manga that have the manga title as name.
         sys_helper.create_manga_dir()
+        # We can now start downloading.
+        downloader = Downloader(manga, quality, threads, force_ssl)
+        downloader.main(sys_helper)
     except (NoneUUID, LangNotAvail):
         return 1
 
@@ -73,5 +91,5 @@ def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, archive_f
 
 # TODO: remove this before merging with main.
 if __name__ == "__main__":
-    main("52829b03-4675-4a1e-a4be-742436a6e306", (None, None, True), "en", "v1v",
-         str(pathlib.Path().resolve().absolute()), "zip", "DEBUG")
+    main("52829b03-4675-4a1e-a4be-742436a6e306", (None, None, True), "en", None,
+         str(os.path.join(pathlib.Path().resolve().absolute(), "Manga")), "data", 0, False, "zip", "DEBUG")
