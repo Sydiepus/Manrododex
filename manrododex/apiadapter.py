@@ -84,17 +84,26 @@ class ApiAdapter:
             raise RequestDidNotSucceed
 
     @classmethod
-    def img_download(cls, img_link):
+    def img_download(cls, img_link, img_path, bar):
         should_report = True if not re.search(".*(\.?mangadex.org).*", img_link) else False
         cls.can_i_mauwku_requesto_senpai()
         logging.debug("Downloading img from link : %s", img_link)
-        req = cls.session.request("get", img_link)
+        # https://stackoverflow.com/a/62113293
+        req = cls.session.request("get", img_link, stream=True)
         success = req.status_code == 200
-        try:
-            cached = True if "HIT" in req.headers["X-Cache"] else False
-        except KeyError:
-            cached = False
+        if success:
+            logging.debug("Request successful.")
+            total = int(req.headers.get('content-length', 0))
+            bar.total = total
+            with open(img_path, "wb") as f:
+                for data in req.iter_content(chunk_size=1024):
+                    size = f.write(data)
+                    bar.update(size)
         if should_report:
+            try:
+                cached = True if "HIT" in req.headers["X-Cache"] else False
+            except KeyError:
+                cached = False
             logging.debug("Reporting request to mangadex.")
             # The time function returns the time in seconds.
             # Mangadex wants it in milliseconds.
@@ -111,9 +120,6 @@ class ApiAdapter:
             }
             # report
             cls.session.request("post", REPORT_ENDPOINT_URL, params=data, headers=header)
-        if success:
-            logging.debug("Request successful.")
-            return req
-        else:
+        if not success:
             logging.error("Failed to make request.")
             raise RequestDidNotSucceed

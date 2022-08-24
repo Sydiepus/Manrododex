@@ -18,9 +18,6 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-import os
-import pathlib
-
 import manrododex.logger as logger
 from manrododex.downloader import Downloader
 from manrododex.exceptions import NoneUUID, LangNotAvail, RequestDidNotSucceed
@@ -93,9 +90,3 @@ def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, quality, 
         return 1
 
     return 0
-
-
-# TODO: remove this before merging with main.
-if __name__ == "__main__":
-    main("52829b03-4675-4a1e-a4be-742436a6e306", (None, None, True), "en", None,
-         str(os.path.join(pathlib.Path().resolve().absolute(), "Manga")), "data-saver", 1, False, "cbz", "DEBUG")

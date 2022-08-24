@@ -21,6 +21,8 @@ import logging
 import re
 from threading import Thread
 
+from tqdm import tqdm
+
 from manrododex.apiadapter import ApiAdapter
 from manrododex.manga_helpers import Images
 
@@ -66,17 +68,14 @@ class Downloader:
         self.threads = threads
         self.force_ssl = force_ssl
         self.images = Images()
-        self.volume = None
-        self.chapter = None
+        self.chapter_name = None
         logging.info("Downloader created successfully.")
 
     def build_images_link(self, sys_helper):
         chapter = self.chapters.get()
-        self.volume = chapter[0]
-        self.chapter = chapter[1]
-        chapter_name = _chapter_archive_name(self.volume, self.chapter)
-        logging.debug("Chapter will be named : %s", chapter_name)
-        exists = sys_helper.check_if_already_exists(chapter_name)
+        self.chapter_name = _chapter_archive_name(chapter[0], chapter[1])
+        logging.debug("Chapter will be named : %s", self.chapter_name)
+        exists = sys_helper.check_if_already_exists(self.chapter_name)
         img_check = None
         if exists == "FolderAndArchive":
             # Check Both and complete the one with the most images.
@@ -108,8 +107,7 @@ class Downloader:
             # Archive already exists download the missing images if any.
             logging.info("Completing what's missing from the archive if any.")
             img_check = sys_helper.get_archive_content()
-        sys_helper.create_chapter_dir(chapter_name)
-        del chapter_name
+        sys_helper.create_chapter_dir(self.chapter_name)
         info = ApiAdapter.make_request("get",
                                        f"{AT_HOME_SERVER_ENDPOINT}/{chapter[2]}",
                                        passed_params={
@@ -129,28 +127,43 @@ class Downloader:
         logging.info("All required images for the chapter have been added.")
         return exists
 
-    def download_image(self, sys_helper):
+    def download_image(self, sys_helper, bar, thread_desc):
         img_link = self.images.get()
         img_name = _get_image_name(img_link)
         img_ext = _get_image_ext(img_link)
+        bar.set_description(f"{thread_desc} Downloading {img_name}{img_ext}")
         img_path = sys_helper.forge_img_path(img_name, img_ext)
         del img_name, img_ext
-        img = ApiAdapter.img_download(img_link)
+        ApiAdapter.img_download(img_link, img_path, bar)
         del img_link
-        logging.debug("Writing image to file.")
-        with open(img_path, "wb") as f:
-            f.write(img.content)
         self.images.task_done()
 
-    def download_images(self, sys_helper):
+    def download_images(self, sys_helper, thread_number, chapter_bar):
+        thread_desc = f"Thread nb {thread_number}"
+        bar = tqdm(desc=thread_desc,
+                   position=thread_number,
+                   unit="iB",
+                   unit_scale=True,
+                   unit_divisor=1024,
+                   leave=False)
         while not self.images.empty():
-            self.download_image(sys_helper)
+            self.download_image(sys_helper, bar, thread_desc)
+            chapter_bar.update(1)
+            bar.reset()
 
     def main(self, sys_helper):
+        chapter_bar = tqdm(desc="Downloading chapters.",
+                           bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} images",
+                           position=0,
+                           leave=False)
         while not self.chapters.empty():
             any_to_fix = self.build_images_link(sys_helper)
-            for _ in range(self.threads):
-                del _
-                Thread(target=self.download_images, args=(sys_helper,), daemon=True).start()
-            self.images.join()
+            total = self.images.qsize()
+            chapter_bar.__dict__.update({"total": total,
+                                         "desc": f"Downloading {self.chapter_name}"})
+            if not self.images.empty():
+                for i in range(self.threads):
+                    Thread(target=self.download_images, args=(sys_helper, i + 1, chapter_bar)).start()
+                self.images.join()
             sys_helper.archive_chapter(any_to_fix)
+            chapter_bar.reset()
