@@ -17,17 +17,17 @@
 #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
-
+import logging
 import re
+from threading import Thread
 
 from manrododex.apiadapter import ApiAdapter
 from manrododex.manga_helpers import Images
-from manrododex.system_helper import path_exits
 
 AT_HOME_SERVER_ENDPOINT = "/at-home/server"
 
 
-def chapter_archive_name(vol, chap):
+def _chapter_archive_name(vol, chap):
     if vol != "none":
         chapter_name = f"vol-{vol}-chapter-{chap}"
     elif chap == "Oneshot":
@@ -35,6 +35,14 @@ def chapter_archive_name(vol, chap):
     else:
         chapter_name = f"chapter-{chap}"
     return chapter_name
+
+
+def _get_image_name(img_link):
+    return re.search("(x?)([0-9]+)(-)", img_link).group(2)
+
+
+def _get_image_ext(img_link):
+    return re.search("(-)(.*)(\..*$)", img_link).group(3)
 
 
 class Downloader:
@@ -52,46 +60,97 @@ class Downloader:
         from https://api.mangadex.org/swagger.html
     """
 
-    def __init__(self, manga, quality, threads, force_ssl):
-        self.manga = manga
+    def __init__(self, chapters, quality, threads, force_ssl):
+        self.chapters = chapters
         self.quality = quality
         self.threads = threads
         self.force_ssl = force_ssl
         self.images = Images()
         self.volume = None
         self.chapter = None
+        logging.info("Downloader created successfully.")
 
-    def build_images_link(self):
-        chapter = self.manga.chapters.get()
+    def build_images_link(self, sys_helper):
+        chapter = self.chapters.get()
         self.volume = chapter[0]
         self.chapter = chapter[1]
+        chapter_name = _chapter_archive_name(self.volume, self.chapter)
+        logging.debug("Chapter will be named : %s", chapter_name)
+        exists = sys_helper.check_if_already_exists(chapter_name)
+        img_check = None
+        if exists == "FolderAndArchive":
+            # Check Both and complete the one with the most images.
+            dir_list = sys_helper.get_dir_content()
+            archive_list = sys_helper.get_archive_content()
+            if len(dir_list) >= len(archive_list):
+                # if directory contains more images delete the archive.
+                # or if they're equal delete the archive the directory is easier to handle.
+                logging.info("Chapter Directory contains more stuff than the archive, deleting the archive.")
+                del archive_list
+                sys_helper.del_archive()
+                img_check = dir_list
+                del dir_list
+                exists = None
+            elif len(archive_list) > len(dir_list):
+                # if archive contains more delete the directory
+                logging.info("Archive contains more stuff than the directory, deleting the directory.")
+                del dir_list
+                sys_helper.del_dir()
+                img_check = archive_list
+                del archive_list
+                exists = "Archive"
+        elif exists == "Folder":
+            # Folder already exists download the missing images if any.
+            logging.info("Completing what's missing from the directory if any.")
+            img_check = sys_helper.get_dir_content()
+            exists = None
+        elif exists == "Archive":
+            # Archive already exists download the missing images if any.
+            logging.info("Completing what's missing from the archive if any.")
+            img_check = sys_helper.get_archive_content()
+        sys_helper.create_chapter_dir(chapter_name)
+        del chapter_name
         info = ApiAdapter.make_request("get",
                                        f"{AT_HOME_SERVER_ENDPOINT}/{chapter[2]}",
                                        passed_params={
                                            "forcePort443": self.force_ssl
                                        })
+        del chapter
         base_url = info["baseUrl"]
         chapter_hash = info["chapter"]["hash"]
         images = info["chapter"]["dataSaver"] if self.quality == "data-saver" else info["chapter"]["data"]
+        del info
         for image in images:
+            if img_check:
+                if f"{_get_image_name(image)}{_get_image_ext(image)}" in img_check:
+                    continue
             self.images.put(f"{base_url}/{self.quality}/{chapter_hash}/{image}")
+            logging.debug("Image added successfully.")
+        logging.info("All required images for the chapter have been added.")
+        return exists
 
     def download_image(self, sys_helper):
         img_link = self.images.get()
-        img_name = re.search("(x?)([0-9]+)(-)", img_link).group(2)
-        img_ext = re.search("(-)(.*)(\..*$)", img_link).group(3)
+        img_name = _get_image_name(img_link)
+        img_ext = _get_image_ext(img_link)
         img_path = sys_helper.forge_img_path(img_name, img_ext)
-        if path_exits(img_path):
-            return
+        del img_name, img_ext
         img = ApiAdapter.img_download(img_link)
+        del img_link
+        logging.debug("Writing image to file.")
         with open(img_path, "wb") as f:
             f.write(img.content)
+        self.images.task_done()
 
-    def main(self, sys_helper):
-        self.build_images_link()
-        chapter_name = chapter_archive_name(self.volume, self.chapter)
-        sys_helper.create_chapter_dir(chapter_name)
-        del chapter_name
+    def download_images(self, sys_helper):
         while not self.images.empty():
             self.download_image(sys_helper)
-        sys_helper.archive_chapter()
+
+    def main(self, sys_helper):
+        while not self.chapters.empty():
+            any_to_fix = self.build_images_link(sys_helper)
+            for _ in range(self.threads):
+                del _
+                Thread(target=self.download_images, args=(sys_helper,), daemon=True).start()
+            self.images.join()
+            sys_helper.archive_chapter(any_to_fix)
