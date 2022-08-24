@@ -18,8 +18,10 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-from os import path, makedirs
-from shutil import make_archive, rmtree
+import logging
+from os import path, makedirs, listdir, remove
+from shutil import rmtree
+from zipfile import ZipFile
 
 
 def path_exits(given_path):
@@ -32,23 +34,76 @@ class SysHelper:
         self.manga_path = path.join(self.main_path, manga_title)
         self.chapter_path = None
         self.archive_format = archive_format
+        self.archive_path = None
+        logging.info("SysHelper created with no errors.")
 
     def create_main_manga_dir(self):
+        logging.debug("Creating main manga directory at %s", self.main_path)
         if not path.exists(self.main_path):
             makedirs(self.main_path)
+        logging.debug("Directory already exists, not creating.")
 
     def create_manga_dir(self):
+        logging.debug("Creating main manga directory at %s", self.manga_path)
         if not path.exists(self.manga_path):
             makedirs(self.manga_path)
+        logging.debug("Directory already exists, not creating.")
 
     def create_chapter_dir(self, chapter_name):
         self.chapter_path = path.join(self.manga_path, chapter_name)
+        logging.debug("Creating main manga directory at %s", self.chapter_path)
         if not path.exists(self.chapter_path):
             makedirs(self.chapter_path)
+        logging.debug("Directory already exists, not creating.")
 
     def forge_img_path(self, img_name, img_ext):
         return path.join(self.chapter_path, f"{img_name}{img_ext}")
 
-    def archive_chapter(self):
-        make_archive(self.chapter_path, self.archive_format, root_dir=self.chapter_path)
+    # noinspection PyTypeChecker
+    def archive_chapter(self, any_to_fix):
+        if not any_to_fix:
+            logging.debug("Archiving directory.")
+            archive_mode = "w"
+        else:
+            # append images to zip.
+            logging.debug("Appending images to already existing archive.")
+            archive_mode = "a"
+        with ZipFile(self.archive_path, mode=archive_mode) as f:
+            dir_list = self.get_dir_content()
+            for file in dir_list:
+                file_path = path.join(self.chapter_path, file)
+                logging.debug("Adding file %s", file_path)
+                f.write(file_path, path.basename(file_path))
+        logging.info("All images added to archive successfully.")
+        self.del_dir()
+
+    def check_if_already_exists(self, chapter_name):
+        self.chapter_path = path.join(self.manga_path, chapter_name)
+        self.archive_path = self.chapter_path + f".{self.archive_format}"
+        if path.exists(self.chapter_path) and path.exists(self.archive_path):
+            logging.info("Folder and Archive already exists !!")
+            return "FolderAndArchive"
+        elif path.exists(self.chapter_path):
+            logging.info("Folder already exists !!")
+            return "Folder"
+        elif path.exists(self.archive_path):
+            logging.info("Archive already exists !!")
+            return "Archive"
+        else:
+            return None
+
+    def get_dir_content(self):
+        return listdir(self.chapter_path)
+
+    def get_archive_content(self):
+        with ZipFile(self.archive_path, "r") as f:
+            zip_content = f.namelist()
+            return zip_content
+
+    def del_archive(self):
+        logging.debug("Deleting Archive : %s", self.archive_path)
+        remove(self.archive_path)
+
+    def del_dir(self):
+        logging.debug("Deleting directory and all it's content : %s", self.chapter_path)
         rmtree(self.chapter_path)
