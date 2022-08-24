@@ -54,7 +54,7 @@ def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, quality, 
         other option(s): data-saver
     threads:
         type: int
-        default: 0
+        default: 1
     force_ssl:
         type: bool
         default False
@@ -68,20 +68,26 @@ def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, quality, 
         default: INFO
     """
     logger.init(log_level)
+    del log_level
     try:
         manga = Manga(url_uuid, lang)
+        del url_uuid, lang
         # Make the request to get basic info about the manga.
         manga.get_info(title_settings)
+        del title_settings
         # Make the requests to get the available chapters.
         manga.get_chapters(selected_vol_chap)
+        del selected_vol_chap
         # It's now time to download the manga.
         sys_helper = SysHelper(main_path, manga.info["title"], archive_format)
+        del main_path, archive_format
         # First create the main manga directory where the manga need to be put.
         sys_helper.create_main_manga_dir()
         # Then we create the directory for the manga that have the manga title as name.
         sys_helper.create_manga_dir()
         # We can now start downloading.
-        downloader = Downloader(manga, quality, threads, force_ssl)
+        downloader = Downloader(manga.chapters, quality, threads, force_ssl)
+        del manga, quality, threads, force_ssl
         downloader.main(sys_helper)
     except (NoneUUID, LangNotAvail, RequestDidNotSucceed):
         return 1
@@ -92,4 +98,4 @@ def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, quality, 
 # TODO: remove this before merging with main.
 if __name__ == "__main__":
     main("52829b03-4675-4a1e-a4be-742436a6e306", (None, None, True), "en", None,
-         str(os.path.join(pathlib.Path().resolve().absolute(), "Manga")), "data", 0, False, "zip", "DEBUG")
+         str(os.path.join(pathlib.Path().resolve().absolute(), "Manga")), "data-saver", 1, False, "cbz", "DEBUG")
