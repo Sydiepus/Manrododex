@@ -87,6 +87,7 @@ class ApiAdapter:
     def img_download(cls, img_link):
         should_report = True if not re.search(".*(\.?mangadex.org).*", img_link) else False
         cls.can_i_mauwku_requesto_senpai()
+        logging.debug("Downloading img from link : %s", img_link)
         req = cls.session.request("get", img_link)
         success = req.status_code == 200
         try:
@@ -94,6 +95,7 @@ class ApiAdapter:
         except KeyError:
             cached = False
         if should_report:
+            logging.debug("Reporting request to mangadex.")
             # The time function returns the time in seconds.
             # Mangadex wants it in milliseconds.
             duration = req.elapsed.microseconds
@@ -112,3 +114,6 @@ class ApiAdapter:
         if success:
             logging.debug("Request successful.")
             return req
+        else:
+            logging.error("Failed to make request.")
+            raise RequestDidNotSucceed
