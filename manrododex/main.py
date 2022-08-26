@@ -18,6 +18,8 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
+from tqdm import tqdm
+
 import manrododex.logger as logger
 from manrododex.downloader import Downloader
 from manrododex.exceptions import NoneUUID, LangNotAvail, RequestDidNotSucceed
@@ -67,13 +69,24 @@ def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, quality, 
     logger.init(log_level)
     del log_level
     try:
+        main_bar = tqdm(desc="Starting Manga Download",
+                        bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} chapters",
+                        position=0,
+                        leave=False)
         manga = Manga(url_uuid, lang)
+        main_bar.desc = f"Getting info on {manga.uuid} with language {manga.lang}"
+        main_bar.refresh()
         del url_uuid, lang
         # Make the request to get basic info about the manga.
         manga.get_info(title_settings)
+        main_bar.desc = f"Downloading : {manga.info['title']}"
+        main_bar.refresh()
         del title_settings
         # Make the requests to get the available chapters.
         manga.get_chapters(selected_vol_chap)
+        main_bar.total = manga.chapters.qsize()
+        main_bar.desc = f"Downloading {manga.info['title']} chapters"
+        main_bar.refresh()
         del selected_vol_chap
         # It's now time to download the manga.
         sys_helper = SysHelper(main_path, manga.info["title"], archive_format)
@@ -85,7 +98,7 @@ def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, quality, 
         # We can now start downloading.
         downloader = Downloader(manga.chapters, quality, threads, force_ssl)
         del manga, quality, threads, force_ssl
-        downloader.main(sys_helper)
+        downloader.main(sys_helper, main_bar)
     except (NoneUUID, LangNotAvail, RequestDidNotSucceed):
         return 1
 

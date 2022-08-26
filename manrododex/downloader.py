@@ -141,7 +141,7 @@ class Downloader:
     def download_images(self, sys_helper, thread_number, chapter_bar):
         thread_desc = f"Thread nb {thread_number}"
         bar = tqdm(desc=thread_desc,
-                   position=thread_number,
+                   position=thread_number + 1,
                    unit="iB",
                    unit_scale=True,
                    unit_divisor=1024,
@@ -151,10 +151,10 @@ class Downloader:
             chapter_bar.update(1)
             bar.reset()
 
-    def main(self, sys_helper):
+    def main(self, sys_helper, main_bar):
         chapter_bar = tqdm(desc="Downloading chapters.",
                            bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} images",
-                           position=0,
+                           position=1,
                            leave=False)
         while not self.chapters.empty():
             any_to_fix = self.build_images_link(sys_helper)
@@ -167,3 +167,4 @@ class Downloader:
                 self.images.join()
             sys_helper.archive_chapter(any_to_fix)
             chapter_bar.reset()
+            main_bar.update(1)
