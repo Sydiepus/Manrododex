@@ -71,7 +71,7 @@ class Downloader:
         self.chapter_name = None
         logging.info("Downloader created successfully.")
 
-    def build_images_link(self, sys_helper):
+    def _build_images_link(self, sys_helper):
         chapter = self.chapters.get()
         self.chapter_name = _chapter_archive_name(chapter[0], chapter[1])
         logging.debug("Chapter will be named : %s", self.chapter_name)
@@ -127,7 +127,7 @@ class Downloader:
         logging.info("All required images for the chapter have been added.")
         return exists
 
-    def download_image(self, sys_helper, bar, thread_desc):
+    def _download_image(self, sys_helper, bar, thread_desc):
         img_link = self.images.get()
         img_name = _get_image_name(img_link)
         img_ext = _get_image_ext(img_link)
@@ -138,7 +138,7 @@ class Downloader:
         del img_link
         self.images.task_done()
 
-    def download_images(self, sys_helper, thread_number, chapter_bar):
+    def _download_images(self, sys_helper, thread_number, chapter_bar):
         thread_desc = f"Thread nb {thread_number}"
         bar = tqdm(desc=thread_desc,
                    position=thread_number + 1,
@@ -147,7 +147,7 @@ class Downloader:
                    unit_divisor=1024,
                    leave=False)
         while not self.images.empty():
-            self.download_image(sys_helper, bar, thread_desc)
+            self._download_image(sys_helper, bar, thread_desc)
             chapter_bar.update(1)
             bar.reset()
 
@@ -157,13 +157,13 @@ class Downloader:
                            position=1,
                            leave=False)
         while not self.chapters.empty():
-            any_to_fix = self.build_images_link(sys_helper)
+            any_to_fix = self._build_images_link(sys_helper)
             total = self.images.qsize()
             chapter_bar.__dict__.update({"total": total,
                                          "desc": f"Downloading {self.chapter_name}"})
             if not self.images.empty():
                 for i in range(self.threads):
-                    Thread(target=self.download_images, args=(sys_helper, i + 1, chapter_bar)).start()
+                    Thread(target=self._download_images, args=(sys_helper, i + 1, chapter_bar)).start()
                 self.images.join()
             sys_helper.archive_chapter(any_to_fix)
             chapter_bar.reset()
