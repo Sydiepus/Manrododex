@@ -17,28 +17,8 @@
 #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
+from setuptools import setup
 
-# https://stackoverflow.com/a/11155124
-
-def _required_args(args_parser):
-    args = args_parser.add_mutually_exclusive_group()
-    args.add_argument(
-        "url_uuid",
-        metavar="URL_UUID",
-        type=str,
-        nargs="?",
-        help=(
-            "%(metavar)s, i.e. link or uuid of the manga to be downloaded."
-        )
-    )
-    args.add_argument(
-        "-F",
-        "--File",
-        metavar="FILE",
-        default=None,
-        type=str,
-        nargs="?",
-        help=(
-            "%(metavar)s, i.e. folder containing the links or uuids of the mangas to be downloaded."
-        )
-    )
+setup(
+    use_scm_version=True,
+)

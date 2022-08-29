@@ -20,15 +20,13 @@
 
 from tqdm import tqdm
 
-import manrododex.logger as logger
 from manrododex.downloader import Downloader
 from manrododex.exceptions import NoneUUID, LangNotAvail, RequestDidNotSucceed
 from manrododex.manga import Manga
 from manrododex.system_helper import SysHelper
 
 
-def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, quality, threads, force_ssl, archive_format,
-         log_level):
+def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, quality, threads, force_ssl, archive_format):
     """A comment to keep track of the parameters.
     Parameters:
     ------------
@@ -56,7 +54,7 @@ def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, quality, 
         default: 1
     force_ssl:
         type: bool
-        default False
+        default: False
         other option(s): True
     archive_format:
         type: str
@@ -66,8 +64,6 @@ def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, quality, 
         type: str
         default: INFO
     """
-    logger.init(log_level)
-    del log_level
     try:
         main_bar = tqdm(desc="Starting Manga Download",
                         bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} chapters",
@@ -103,3 +99,23 @@ def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, quality, 
         return 1
 
     return 0
+
+
+def file_main(FILE, title_settings, lang, selected_vol_chap, main_path, quality, threads, force_ssl, archive_format):
+    """The file should contain at most three things the first being mandatory:
+     url/uuid
+     custom manga name
+     the language"""
+    with open(FILE, "r") as f:
+        lines = f.readlines()
+        for line in lines:
+            line_comp = line.strip().split(",")
+            if len(line_comp) == 3:
+                main(line_comp[0], (line_comp[1], None, False), line_comp[2], selected_vol_chap, main_path, quality,
+                     threads, force_ssl, archive_format)
+            elif len(line_comp) == 2:
+                main(line_comp[0], (line_comp[1], None, False), lang, selected_vol_chap, main_path, quality, threads,
+                     force_ssl, archive_format)
+            elif len(line_comp) == 1:
+                main(line_comp[0], title_settings, lang, selected_vol_chap, main_path, quality, threads, force_ssl,
+                     archive_format)

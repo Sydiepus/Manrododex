@@ -17,28 +17,30 @@
 #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
+import sys
 
-# https://stackoverflow.com/a/11155124
+import manrododex.logger as logger
+from manrododex.CLI.argparse import initialize_args
+from manrododex.main import main, file_main
 
-def _required_args(args_parser):
-    args = args_parser.add_mutually_exclusive_group()
-    args.add_argument(
-        "url_uuid",
-        metavar="URL_UUID",
-        type=str,
-        nargs="?",
-        help=(
-            "%(metavar)s, i.e. link or uuid of the manga to be downloaded."
-        )
-    )
-    args.add_argument(
-        "-F",
-        "--File",
-        metavar="FILE",
-        default=None,
-        type=str,
-        nargs="?",
-        help=(
-            "%(metavar)s, i.e. folder containing the links or uuids of the mangas to be downloaded."
-        )
-    )
+
+def cli_handler():
+    parser = initialize_args()
+    args = parser.parse_args()
+    logger.init(args.log_level.upper())
+    title_settings = (args.name, args.alttitle_lang, args.deftitle)
+    if len(sys.argv) <= 1:
+        parser.print_help()
+    else:
+        if args.File is None:
+            main(args.url_uuid, title_settings, args.language, args.selvolchap, args.destination, args.quality,
+                 args.threads,
+                 args.force_ssl, args.archive_format)
+        else:
+            file_main(args.File, title_settings, args.language, args.selvolchap, args.destination, args.quality,
+                      args.threads,
+                      args.force_ssl, args.archive_format)
+
+
+if __name__ == "__main__":
+    cli_handler()

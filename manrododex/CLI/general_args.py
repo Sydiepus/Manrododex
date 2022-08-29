@@ -19,20 +19,20 @@
 #  SOFTWARE.
 
 import os
-import pathlib
+from tempfile import gettempdir
 
 # https://github.com/qtile/qtile/blob/master/libqtile/scripts/main.py
 try:
     # Python>3.7 can get the version from importlib
     from importlib.metadata import distribution
 
-    VERSION = distribution("qtile").version
+    VERSION = distribution("manrododex").version
 except ModuleNotFoundError:
     try:
         # pkg_resources is required for 3.7
         import pkg_resources
 
-        VERSION = pkg_resources.require("qtile")[0].version
+        VERSION = pkg_resources.require("manrododex")[0].version
     except (pkg_resources.DistributionNotFound, ModuleNotFoundError):
         VERSION = "dev"
 
@@ -41,7 +41,6 @@ except ModuleNotFoundError:
 def _gen_args(args_parser):
     args = args_parser.add_argument_group("General options")
     args.add_argument(
-        "-v",
         "--version",
         action="version",
         version=VERSION,
@@ -50,13 +49,11 @@ def _gen_args(args_parser):
         )
     )
     args.add_argument(
-        "-d",
-        "--destination",
-        metavar="PATH",
+        "--log-level",
         type=str,
-        default=str(os.path.join(pathlib.Path().resolve().absolute(), "Manga")),
-        help=(
-            "Destination folder to where the manga will be saved locally. "
-            "The path will be './%(metavar)s/manga_name/'"
-        )
+        metavar="LOGLVL",
+        default="INFO",
+        help="Set the log level."
+             f"Default log file location {os.path.join(gettempdir(), 'manrododex.log')}"
+             "possible values : 'DEBUG' 'INFO' 'WARNING' 'ERROR' 'CRITICAL'",
     )
