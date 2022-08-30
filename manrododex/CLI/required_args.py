@@ -28,7 +28,7 @@ def _required_args(args_parser):
         type=str,
         nargs="?",
         help=(
-            "%(metavar)s, i.e. link or uuid of the manga to be downloaded."
+            "%(metavar)s, i.e. link or uuid of the manga to be downloaded.\n"
         )
     )
     args.add_argument(
@@ -39,6 +39,6 @@ def _required_args(args_parser):
         type=str,
         nargs="?",
         help=(
-            "%(metavar)s, i.e. folder containing the links or uuids of the mangas to be downloaded."
+            "%(metavar)s, i.e. folder containing the links or uuids of the mangas to be downloaded.\n"
         )
     )

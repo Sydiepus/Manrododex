@@ -37,6 +37,13 @@ except ModuleNotFoundError:
         VERSION = "dev"
 
 
+def check_logger(log):
+    if log.upper() in ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]:
+        return log.upper()
+    else:
+        return "INFO"
+
+
 # https://github.com/manga-py/manga-py/blob/d89501a0f78d498f85114320d6123f59d328a905/manga_py/cli/_args_general.py#L4
 def _gen_args(args_parser):
     args = args_parser.add_argument_group("General options")
@@ -45,15 +52,15 @@ def _gen_args(args_parser):
         action="version",
         version=VERSION,
         help=(
-            "Shows %(prog)s's version and exit."
+            "Shows %(prog)s's version and exit.\n"
         )
     )
     args.add_argument(
         "--log-level",
-        type=str,
+        type=check_logger,
         metavar="LOGLVL",
         default="INFO",
-        help="Set the log level."
-             f"Default log file location {os.path.join(gettempdir(), 'manrododex.log')}"
-             "possible values : 'DEBUG' 'INFO' 'WARNING' 'ERROR' 'CRITICAL'",
+        help="Set the log level.\n"
+             f"Default log file location {os.path.join(gettempdir(), 'manrododex.log')}\n"
+             "possible values : 'DEBUG' 'INFO' 'WARNING' 'ERROR' 'CRITICAL'\n",
     )

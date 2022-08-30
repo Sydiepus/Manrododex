@@ -17,11 +17,30 @@
 #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
+# iso639-1.tsv from https://id.loc.gov/vocabulary/iso639-1.html
+import json
 
-# https://stackoverflow.com/a/32773402
-import pycountry
+lang = dict()
 
-"""Use this to check if the right lang code was used before staring to get the info, ..."""
-langs = [lang.iso639_1_code
-         for lang in pycountry.languages
-         if hasattr(lang, 'iso639_1_code')]
+with open("iso639-1.tsv", "r") as f:
+    lines = f.readlines()
+    for line in lines:
+        line_comp = line.split("\t")
+        if len(line_comp[1]) == 2:
+            lang.update({line_comp[1]: line_comp[2]})
+
+mangadex_exceptions = {
+    "zh": "Simplified Chinese",
+    "zh-hk": "Traditional Chinese",
+    "pt-br": "Brazilian Portugese",
+    "es": "Castilian Spanish",
+    "es-la": "Latin American Spanish",
+    "ja-ro": "Romanized Japanese",
+    "ko-ro": "Romanized Korean",
+    "zh-ro": "Romanized Chinese"
+}
+
+lang.update(mangadex_exceptions)
+
+with open("mangadex-iso639-1.json", "w") as f:
+    f.write(json.dumps(lang))
