@@ -17,6 +17,7 @@
 #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
+import json
 import sys
 
 import manrododex.logger as logger
@@ -24,22 +25,30 @@ from manrododex.CLI.argparse import initialize_args
 from manrododex.main import main, file_main
 
 
+def print_lang_codes():
+    from manrododex.mangadex_lang_codes import lang_codes
+    print(json.dumps(lang_codes, indent=4))
+
+
 def cli_handler():
     parser = initialize_args()
     args = parser.parse_args()
+    if args.lang_codes:
+        print_lang_codes()
+        return
     logger.init(args.log_level)
     title_settings = (args.name, args.alttitle_lang, args.deftitle)
     if len(sys.argv) <= 1:
         parser.print_help()
     else:
         if args.File is None:
-            main(args.url_uuid, title_settings, args.language, args.selvolchap, args.destination, args.quality,
+            main(args.url_uuid, title_settings, args.language, args.selvolchap, args.destination, args.data_saver,
                  args.threads,
-                 args.force_ssl, args.archive_format)
+                 args.force_ssl, args.zip_format)
         else:
-            file_main(args.File, title_settings, args.language, args.selvolchap, args.destination, args.quality,
+            file_main(args.File, title_settings, args.language, args.selvolchap, args.destination, args.data_saver,
                       args.threads,
-                      args.force_ssl, args.archive_format)
+                      args.force_ssl, args.zip_format)
 
 
 if __name__ == "__main__":

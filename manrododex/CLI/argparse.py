@@ -18,7 +18,7 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-from argparse import ArgumentParser
+from argparse import ArgumentParser, RawTextHelpFormatter
 
 from .downloading_args import _download_args
 from .general_args import _gen_args
@@ -30,7 +30,8 @@ def initialize_args():
         description=(
             "%(prog)s is a manga downloader for Mangadex using their api.\n"
             "Source-code: https://github.com/Sydiepus/Manrododex\n"
-        )
+        ),
+        formatter_class=RawTextHelpFormatter
     )
     _required_args(args_parser)
     _gen_args(args_parser)

@@ -127,11 +127,10 @@ def _download_args(args_parser):
              "from https://api.mangadex.org/swagger.html\n",
     )
     args.add_argument(
-        "--archive-format-zip",
+        "--zip-format",
         action="store_const",
         const="zip",
         default="cbz",
-        help="The archive extension to use.\n"
-             "Can only be cbz or zip.\n"
-             "The use of this argument will switch it to zip.\n",
+        help="The use of this argument will switch it to zip.\n"
+             "By default the cbz archive format will be used.\n",
     )

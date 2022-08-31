@@ -64,3 +64,11 @@ def _gen_args(args_parser):
              f"Default log file location {os.path.join(gettempdir(), 'manrododex.log')}\n"
              "possible values : 'DEBUG' 'INFO' 'WARNING' 'ERROR' 'CRITICAL'\n",
     )
+    args.add_argument(
+        "--lang-codes",
+        action="store_true",
+        default=False,
+        help=(
+            "Prints the available language codes and exit.\n"
+        )
+    )
