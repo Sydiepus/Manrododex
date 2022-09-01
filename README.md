@@ -37,3 +37,22 @@ I might have stolen some ideas from these awesome projects.
 - I'll be taking a break for some time and might not be able to properly test or fix the program.
 - Not tested on Windows yet.
 - wiki coming soon.
+
+## Simple Instructions
+
+- Install with ```pip install manrododex```
+- Download manga
+  with ```manrododex https://mangadex.org/title/b98c4daf-be1a-46c8-ad83-21d532995240/my-food-looks-very-cute```
+- You don't have to use the full link```b98c4daf-be1a-46c8-ad83-21d532995240``` would work too.
+- You can supplement a file with ```-F``` e.g: ```manrododex -F manga.txt```
+- The file should be of this format: ```url/uuid, custom manga name, the language```
+- For example this is a valid file:
+
+```
+https://mangadex.org/title/e1d0056a-fdd3-4f32-af19-50eeb37280ac/new-normal,,
+https://mangadex.org/title/9643f5da-c7da-4705-ac5b-4b4a4c7a649e/gleipnir,, tr
+https://mangadex.org/title/259dfd8a-f06a-4825-8fa6-a2dcd7274230/yofukashi-no-uta, call of the night,
+https://mangadex.org/title/aa6c76f7-5f5f-46b6-a800-911145f81b9b/sono-bisque-doll-wa-koi-wo-suru, Cosplay doll, br
+```
+
+- For more options check ```manrododex --help```
