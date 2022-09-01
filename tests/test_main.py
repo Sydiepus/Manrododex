@@ -18,6 +18,9 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
+import os
+import pathlib
+
 import pytest
 
 import tests
@@ -30,5 +33,7 @@ param = [(u, v) for u, v in zip(uuid_url, ex_resp)]
 
 @pytest.mark.parametrize("uuid_url_p,ex_resp", param)
 def test_main(uuid_url_p, ex_resp):
-    maiden = main(uuid_url_p, (None, "en", True), "en", None, "DEBUG")
+    maiden = main(uuid_url_p(None, None, True), "en", None,
+                  str(os.path.join(pathlib.Path().resolve().absolute(), "Manga")), "data-saver", 3, False, "cbz",
+                  "DEBUG", False)
     assert maiden is ex_resp
