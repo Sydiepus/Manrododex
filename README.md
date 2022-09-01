@@ -1,5 +1,7 @@
+<div>
 <h1 align="center">Manrododex</h1>
 <h3 align="center">マンロードデクス</h3>
+</div>
 
 ### A manga downloader for mangadex using their [API](https://api.mangadex.org/docs/)
 
@@ -15,4 +17,4 @@
 
 ## Maintainer
 
-@Sydiepus GPG: ```BD1D 09DF 8A49 E7A6 C705 3B8A 7D6C DB7E 575A C12A```
+[@Sydiepus](https://github.com/Sydiepus) GPG: ```BD1D 09DF 8A49 E7A6 C705 3B8A 7D6C DB7E 575A C12A```
