@@ -21,9 +21,19 @@
 import os
 import pathlib
 
+import pytest
+
+import test
 from manrododex.main import main
 
-# TODO: remove this before merging with main.
-if __name__ == "__main__":
-    main("52829b03-4675-4a1e-a4be-742436a6e306", (None, None, True), "en", None,
-         str(os.path.join(pathlib.Path().resolve().absolute(), "Manga")), "data-saver", 3, False, "cbz", "DEBUG")
+uuid_url = test.uuid_urls
+ex_resp = test.ex_resp_main
+param = [(u, v) for u, v in zip(uuid_url, ex_resp)]
+
+
+@pytest.mark.parametrize("uuid_url_p,ex_resp", param)
+def test_main(uuid_url_p, ex_resp):
+    maiden = main(uuid_url_p(None, None, True), "en", None,
+                  str(os.path.join(pathlib.Path().resolve().absolute(), "Manga")), "data-saver", 3, False, "cbz",
+                  "DEBUG", False)
+    assert maiden is ex_resp

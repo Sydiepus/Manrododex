@@ -21,7 +21,7 @@
 import pytest
 
 import manrododex.CLI.downloading_args as da
-from tests import g_lang, ex_lang
+from test import g_lang, ex_lang
 
 
 @pytest.mark.parametrize("lang,exp_lang", [(u, v) for u, v in zip(g_lang, ex_lang)])

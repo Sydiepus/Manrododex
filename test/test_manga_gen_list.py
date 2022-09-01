@@ -18,18 +18,17 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-import re
-
 import pytest
 
-import tests
+import test
+from manrododex.manga import _gen_list
 
-img_l = tests.img_link
-ex_img_name = tests.ex_img_name
-param = [(u, v) for u, v in zip(img_l, ex_img_name)]
+gen = test.gen
+ex_gen = test.ex_gen
+param = [(u, v) for u, v in zip(gen, ex_gen)]
 
 
-@pytest.mark.parametrize("img_link,ex_img_n", param)
-def test_download_image(img_link, ex_img_n):
-    img_name = re.search("(x?)([0-9]+)(-)", img_link).group(2)
-    assert img_name == ex_img_n
+@pytest.mark.parametrize("genf,ex_genf", param)
+def test__gen_list(genf, ex_genf):
+    vol, chap = _gen_list(genf)
+    assert (vol, chap) == ex_genf

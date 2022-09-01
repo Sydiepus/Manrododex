@@ -29,3 +29,9 @@ I might have stolen some ideas from these awesome projects.
 ## Maintainer
 
 [@Sydiepus](https://github.com/Sydiepus) GPG: ```BD1D 09DF 8A49 E7A6 C705 3B8A 7D6C DB7E 575A C12A```
+
+## Note:
+
+- I'll be taking a break for some time and might not be able to properly test or fix the program.
+- Not tested on Windows yet.
+- wiki coming soon.

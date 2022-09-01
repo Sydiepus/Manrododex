@@ -18,18 +18,20 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-import re
-
 import pytest
 
-import tests
+import test
+from manrododex.exceptions import NoneUUID
+from manrododex.manga import Manga
 
-img_l = tests.img_link
-ex_img_exte = tests.ex_img_exte
-param = [(u, v) for u, v in zip(img_l, ex_img_exte)]
+uuid_url = test.uuid_urls
+ex_uuid_url = test.ex_uuid_urls
+param = [(u, ex_u) for u, ex_u in zip(uuid_url, ex_uuid_url)]
 
 
-@pytest.mark.parametrize("img_link,ex_img_ext", param)
-def test_download_image(img_link, ex_img_ext):
-    img_ext = re.search("(-)(.*)(\..*$)", img_link).group(3)
-    assert img_ext == ex_img_ext
+@pytest.mark.parametrize("uuid_url_p,ex_uuid_url_p", param)
+def test_manga(uuid_url_p, ex_uuid_url_p):
+    with pytest.raises(NoneUUID):
+        manga = Manga(uuid_url_p, "en")
+        assert manga.uuid == ex_uuid_url_p
+        raise NoneUUID

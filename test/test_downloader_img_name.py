@@ -18,22 +18,18 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-import os
-import pathlib
+import re
 
 import pytest
 
-import tests
-from manrododex.main import main
+import test
 
-uuid_url = tests.uuid_urls
-ex_resp = tests.ex_resp_main
-param = [(u, v) for u, v in zip(uuid_url, ex_resp)]
+img_l = test.img_link
+ex_img_name = test.ex_img_name
+param = [(u, v) for u, v in zip(img_l, ex_img_name)]
 
 
-@pytest.mark.parametrize("uuid_url_p,ex_resp", param)
-def test_main(uuid_url_p, ex_resp):
-    maiden = main(uuid_url_p(None, None, True), "en", None,
-                  str(os.path.join(pathlib.Path().resolve().absolute(), "Manga")), "data-saver", 3, False, "cbz",
-                  "DEBUG", False)
-    assert maiden is ex_resp
+@pytest.mark.parametrize("img_link,ex_img_n", param)
+def test_download_image(img_link, ex_img_n):
+    img_name = re.search("(x?)([0-9]+)(-)", img_link).group(2)
+    assert img_name == ex_img_n
