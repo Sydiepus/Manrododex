@@ -36,7 +36,8 @@ def cli_handler():
     if args.lang_codes:
         print_lang_codes()
         return
-    logger.init(args.log_level)
+    if not args.dry_run:
+        logger.init(args.log_level)
     title_settings = (args.name, args.alttitle_lang, args.deftitle)
     if len(sys.argv) <= 1:
         parser.print_help()
