@@ -72,3 +72,11 @@ def _gen_args(args_parser):
             "Prints the available language codes and exit.\n"
         )
     )
+    args.add_argument(
+        "--dry-run",
+        action="store_true",
+        default=False,
+        help=(
+            "Run the program without creating/saving anything.\n"
+        )
+    )

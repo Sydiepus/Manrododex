@@ -44,11 +44,11 @@ def cli_handler():
         if args.File is None:
             main(args.url_uuid, title_settings, args.language, args.selvolchap, args.destination, args.data_saver,
                  args.threads,
-                 args.force_ssl, args.zip_format)
+                 args.force_ssl, args.zip_format, args.dry_run)
         else:
             file_main(args.File, title_settings, args.language, args.selvolchap, args.destination, args.data_saver,
                       args.threads,
-                      args.force_ssl, args.zip_format)
+                      args.force_ssl, args.zip_format, args.dry_run)
 
 
 if __name__ == "__main__":

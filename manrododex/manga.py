@@ -227,7 +227,10 @@ class Manga:
             except StopIteration:
                 logging.critical("No suitable description found setting it to None.")
         self.info["status"] = info["status"]
-        self.info["year"] = int(info["year"])
+        try:
+            self.info["year"] = int(info["year"])
+        except TypeError:
+            self.info["year"] = info["year"]
         self.info["age_rating"] = info["contentRating"]
         logging.info("All info fetched successfully.")
 

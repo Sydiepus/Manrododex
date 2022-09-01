@@ -52,6 +52,7 @@ class ApiAdapter:
             deuwuta = cuwuent_taimo - cls.lastu_taimo
             logging.debug("Time since last request '%s'", str(deuwuta))
             if deuwuta >= 0.2:
+                cls.lastu_taimo = cuwuent_taimo
                 return
             else:
                 suweep_fuwu = 0.2 - deuwuta
@@ -84,11 +85,14 @@ class ApiAdapter:
             raise RequestDidNotSucceed
 
     @classmethod
-    def img_download(cls, img_link, img_path, bar):
+    def img_download(cls, img_link, img_path, bar, dry_run):
         should_report = True if not re.search(".*(\.?mangadex.org).*", img_link) else False
         cls.can_i_mauwku_requesto_senpai()
         logging.debug("Downloading img from link : %s", img_link)
         # https://stackoverflow.com/a/62113293
+        if dry_run:
+            logging.debug("Dry run not downloading img.")
+            return
         req = cls.session.request("get", img_link, stream=True)
         success = req.status_code == 200
         if success:

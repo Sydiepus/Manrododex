@@ -29,21 +29,28 @@ def path_exits(given_path):
 
 
 class SysHelper:
-    def __init__(self, main_path, manga_title, archive_format):
+    def __init__(self, main_path, manga_title, archive_format, dry_run):
         self.main_path = main_path
         self.manga_path = path.join(self.main_path, manga_title)
         self.chapter_path = None
         self.archive_format = archive_format
         self.archive_path = None
+        self.dry_run = dry_run
         logging.info("SysHelper created with no errors.")
 
     def create_main_manga_dir(self):
+        if self.dry_run:
+            logging.debug("Dry run not creating directory.")
+            return
         logging.debug("Creating main manga directory at %s", self.main_path)
         if not path.exists(self.main_path):
             makedirs(self.main_path)
         logging.debug("Directory already exists, not creating.")
 
     def create_manga_dir(self):
+        if self.dry_run:
+            logging.debug("Dry run not creating directory.")
+            return
         logging.debug("Creating main manga directory at %s", self.manga_path)
         if not path.exists(self.manga_path):
             makedirs(self.manga_path)
@@ -51,6 +58,9 @@ class SysHelper:
 
     def create_chapter_dir(self, chapter_name):
         self.chapter_path = path.join(self.manga_path, chapter_name)
+        if self.dry_run:
+            logging.debug("Dry run not creating directory.")
+            return
         logging.debug("Creating main manga directory at %s", self.chapter_path)
         if not path.exists(self.chapter_path):
             makedirs(self.chapter_path)
@@ -61,6 +71,9 @@ class SysHelper:
 
     # noinspection PyTypeChecker
     def archive_chapter(self, any_to_fix):
+        if self.dry_run:
+            logging.debug("Dry run not archiving chapter.")
+            return
         if not any_to_fix:
             logging.debug("Archiving directory.")
             archive_mode = "w"
@@ -80,6 +93,9 @@ class SysHelper:
     def check_if_already_exists(self, chapter_name):
         self.chapter_path = path.join(self.manga_path, chapter_name)
         self.archive_path = self.chapter_path + f".{self.archive_format}"
+        if self.dry_run:
+            logging.debug("Dry run not checking if it already exits.")
+            return
         if path.exists(self.chapter_path) and path.exists(self.archive_path):
             logging.info("Folder and Archive already exists !!")
             return "FolderAndArchive"
@@ -93,22 +109,37 @@ class SysHelper:
             return None
 
     def get_dir_content(self):
+        if self.dry_run:
+            logging.debug("Dry run not getting content.")
+            return
         return listdir(self.chapter_path)
 
     def get_archive_content(self):
+        if self.dry_run:
+            logging.debug("Dry run not getting archive content.")
+            return
         with ZipFile(self.archive_path, "r") as f:
             zip_content = f.namelist()
             return zip_content
 
     def del_archive(self):
+        if self.dry_run:
+            logging.debug("Dry run not deleting archive.")
+            return
         logging.debug("Deleting Archive : %s", self.archive_path)
         remove(self.archive_path)
 
     def del_dir(self):
+        if self.dry_run:
+            logging.debug("Dry run not deleting directory.")
+            return
         logging.debug("Deleting directory and all it's content : %s", self.chapter_path)
         rmtree(self.chapter_path)
 
     def write_series_json(self, info):
+        if self.dry_run:
+            logging.debug("Dry run not writing series.json.")
+            return
         series_json = path.join(self.manga_path, "series.json")
         if path.exists(series_json):
             logging.debug("series.json already exists skipping.")

@@ -2,6 +2,8 @@
 <sup><sup>マンロードデクス</sup></sup></h1>
 
 ### A manga downloader for mangadex using their [API](https://api.mangadex.org/docs/)
+![](https://img.shields.io/github/license/Sydiepus/Manrododex)
+![](https://img.shields.io/github/issues/Sydiepus/Manrododex)
 
 ## Features
 
@@ -12,6 +14,17 @@
   and [here](https://github.com/mylar3/mylar3/wiki/series.json-examples))
 - Can be used to automate the download of manga in combination with crontabs/Scheduled Tasks.
 - Manrododex makes it possible to download multiple manga with little to user interaction.
+- A possibly wrong Japanese translation of the name.
+- Bugs
+
+## Inspiration
+
+I might have stolen some ideas from these awesome projects.
+
+- [manga-py](https://github.com/manga-py/manga-py)
+- [mangadex-dl](https://github.com/frozenpandaman/mangadex-dl)
+- [MangaDex.py](https://github.com/Proxymiity/MangaDex.py)
+- [Qtile](https://github.com/qtile/qtile)
 
 ## Maintainer
 

@@ -62,11 +62,12 @@ class Downloader:
         from https://api.mangadex.org/swagger.html
     """
 
-    def __init__(self, chapters, quality, threads, force_ssl):
+    def __init__(self, chapters, quality, threads, force_ssl, dry_run):
         self.chapters = chapters
         self.quality = quality
         self.threads = threads
         self.force_ssl = force_ssl
+        self.dry_run = dry_run
         self.images = Images()
         self.chapter_name = None
         logging.info("Downloader created successfully.")
@@ -134,7 +135,7 @@ class Downloader:
         bar.set_description(f"{thread_desc} Downloading {img_name}{img_ext}")
         img_path = sys_helper.forge_img_path(img_name, img_ext)
         del img_name, img_ext
-        ApiAdapter.img_download(img_link, img_path, bar)
+        ApiAdapter.img_download(img_link, img_path, bar, self.dry_run)
         del img_link
         self.images.task_done()
 
