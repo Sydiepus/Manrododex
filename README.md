@@ -5,6 +5,8 @@
 ![](https://img.shields.io/github/license/Sydiepus/Manrododex)
 ![](https://img.shields.io/github/issues/Sydiepus/Manrododex)
 ![](https://img.shields.io/pypi/pyversions/manrododex)
+![GitHub Workflow Status](https://github.com/Sydiepus/Manrododex/actions/workflows/CI.yml/badge.svg)
+![PyPI](https://img.shields.io/pypi/v/manrododex)
 ## Features
 
 - Threads support for faster downloads.
