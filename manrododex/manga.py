@@ -214,13 +214,21 @@ class Manga:
             logging.critical("Language not available skipping.")
             raise LangNotAvail("Requested language not available for this manga.")
         del avl_langs
-        self.info["title"] = _handle_title(title_settings, info["title"], info["altTitles"])
+        self.info["name"] = _handle_title(title_settings, info["title"], info["altTitles"])
         del title_settings
-        self.info["desc"] = info["description"][self.lang]
-        logging.debug("Using description with language '%s'", self.lang)
+        try:
+            self.info["description_formatted"] = info["description"][self.lang]
+            logging.debug("Using description with language '%s'", self.lang)
+        except KeyError:
+            logging.debug("No description with language '%s'\n Using the first one in the request.", self.lang)
+            try:
+                self.info["description_formatted"] = next(iter(info["description"].values()))
+                logging.debug("Using description with language '%s'", next(iter(info["description"])))
+            except StopIteration:
+                logging.critical("No suitable description found setting it to None.")
         self.info["status"] = info["status"]
-        self.info["year"] = info["year"]
-        self.info["contentRating"] = info["contentRating"]
+        self.info["year"] = int(info["year"])
+        self.info["age_rating"] = info["contentRating"]
         logging.info("All info fetched successfully.")
 
     def _chapters_to_queue(self, vol_list, chap_list, info):

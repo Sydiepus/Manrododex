@@ -17,7 +17,7 @@
 #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
-
+import json
 import logging
 from os import path, makedirs, listdir, remove
 from shutil import rmtree
@@ -107,3 +107,16 @@ class SysHelper:
     def del_dir(self):
         logging.debug("Deleting directory and all it's content : %s", self.chapter_path)
         rmtree(self.chapter_path)
+
+    def write_series_json(self, info):
+        series_json = path.join(self.manga_path, "series.json")
+        if path.exists(series_json):
+            logging.debug("series.json already exists skipping.")
+            return
+        # format from https://github.com/mylar3/mylar3/wiki/series.json-examples
+        data = {
+            "metadata": info
+        }
+        with open(series_json, "w") as s:
+            s.write(json.dumps(data, indent=4))
+        logging.info("series.json has been written.")

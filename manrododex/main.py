@@ -75,22 +75,25 @@ def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, quality, 
         del url_uuid, lang
         # Make the request to get basic info about the manga.
         manga.get_info(title_settings)
-        main_bar.desc = f"Downloading : {manga.info['title']}"
+        main_bar.desc = f"Downloading : {manga.info['name']}"
         main_bar.refresh()
         del title_settings
         # Make the requests to get the available chapters.
         manga.get_chapters(selected_vol_chap)
         main_bar.total = manga.chapters.qsize()
-        main_bar.desc = f"Downloading {manga.info['title']} chapters"
+        main_bar.desc = f"Downloading {manga.info['name']} chapters"
         main_bar.refresh()
         del selected_vol_chap
         # It's now time to download the manga.
-        sys_helper = SysHelper(main_path, manga.info["title"], archive_format)
+        sys_helper = SysHelper(main_path, manga.info["name"], archive_format)
         del main_path, archive_format
         # First create the main manga directory where the manga need to be put.
         sys_helper.create_main_manga_dir()
         # Then we create the directory for the manga that have the manga title as name.
         sys_helper.create_manga_dir()
+        # Create the series.json
+        sys_helper.write_series_json(manga.info)
+        del manga.info
         # We can now start downloading.
         downloader = Downloader(manga.chapters, quality, threads, force_ssl)
         del manga, quality, threads, force_ssl
@@ -101,21 +104,24 @@ def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, quality, 
     return 0
 
 
-def file_main(FILE, title_settings, lang, selected_vol_chap, main_path, quality, threads, force_ssl, archive_format):
+def file_main(file, title_settings, lang, selected_vol_chap, main_path, quality, threads, force_ssl, archive_format):
     """The file should contain at most three things the first being mandatory:
      url/uuid
      custom manga name
      the language"""
-    with open(FILE, "r") as f:
+    with open(file, "r") as f:
         lines = f.readlines()
         for line in lines:
-            line_comp = line.strip().split(",")
+            line_comp = list(map(lambda x: str(x.strip().strip(" ")), line.strip().split(",")))
+            uuid_url = line_comp[0]
+            manga_name = line_comp[1]
+            language = line_comp[2] if len(line_comp[2]) == 2 or len(line_comp[2]) == 5 else lang
             if len(line_comp) == 3:
-                main(line_comp[0], (line_comp[1], None, False), line_comp[2], selected_vol_chap, main_path, quality,
+                main(uuid_url, (manga_name, None, False), language, selected_vol_chap, main_path, quality,
                      threads, force_ssl, archive_format)
             elif len(line_comp) == 2:
-                main(line_comp[0], (line_comp[1], None, False), lang, selected_vol_chap, main_path, quality, threads,
+                main(uuid_url, (manga_name, None, False), lang, selected_vol_chap, main_path, quality, threads,
                      force_ssl, archive_format)
             elif len(line_comp) == 1:
-                main(line_comp[0], title_settings, lang, selected_vol_chap, main_path, quality, threads, force_ssl,
+                main(uuid_url, title_settings, lang, selected_vol_chap, main_path, quality, threads, force_ssl,
                      archive_format)
