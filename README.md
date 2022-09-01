@@ -4,7 +4,7 @@
 ### A manga downloader for mangadex using their [API](https://api.mangadex.org/docs/)
 ![](https://img.shields.io/github/license/Sydiepus/Manrododex)
 ![](https://img.shields.io/github/issues/Sydiepus/Manrododex)
-
+![](https://img.shields.io/pypi/pyversions/manrododex)
 ## Features
 
 - Threads support for faster downloads.
