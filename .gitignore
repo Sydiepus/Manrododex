@@ -6,3 +6,4 @@ build/
 .tox/
 .eggs/
 dist/
+__pycache__/
