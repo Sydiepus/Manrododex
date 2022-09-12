@@ -25,7 +25,7 @@ from .general_args import _gen_args
 from .required_args import _required_args
 
 
-def initialize_args():
+def initialize_args() -> ArgumentParser:
     args_parser = ArgumentParser(
         description=(
             "%(prog)s is a manga downloader for Mangadex using their api.\n"

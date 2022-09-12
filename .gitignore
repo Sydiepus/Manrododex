@@ -1,9 +1,19 @@
+# Pycharm IDE.
 .idea/
+
+# Testing folder.
 Manga/
+
+# files generated when making python package.
 build/
 .pytest_cache/
 *.egg-info/
-.tox/
 .eggs/
 dist/
 __pycache__/
+
+# tox related files.
+.tox/
+
+# documentations
+/docs/_build

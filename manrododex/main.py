@@ -17,6 +17,7 @@
 #  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
+import pathlib
 
 from tqdm import tqdm
 
@@ -26,46 +27,35 @@ from manrododex.manga import Manga
 from manrododex.system_helper import SysHelper
 
 
-def main(url_uuid, title_settings, lang, selected_vol_chap, main_path, quality, threads, force_ssl, archive_format,
-         dry_run):
+def main(url_uuid: str, title_settings: tuple, lang: str, selected_vol_chap: str, main_path: pathlib.Path, quality: str,
+         threads: int, force_ssl: bool, archive_format: str,
+         dry_run: bool) -> int:
     """A comment to keep track of the parameters.
+
     Parameters:
     ------------
     url_uuid:
-        type: str
         default: No Default.
-    title_settings:
-        type: tuple
+    title_settings
         default: (None, None, True)
     lang:
-        type: str
         default: 'en'
     selected_vol_chap:
-        type: str
         default: None
     main_path:
-        type: str/path
         default: current working dir + 'Manga'
     quality:
-        type: str
         default: data
         other option(s): data-saver
     threads:
-        type: int
         default: 1
     force_ssl:
-        type: bool
         default: False
         other option(s): True
     archive_format:
-        type: str
         default: cbz
         other option(s): zip
-    log_level:
-        type: str
-        default: INFO
     dry_run:
-        type: bool
         default: False
     """
     try:
