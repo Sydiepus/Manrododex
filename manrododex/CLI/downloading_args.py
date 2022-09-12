@@ -35,8 +35,8 @@ def check_lang(lang):
 def _download_args(args_parser):
     args = args_parser.add_argument_group("Downloading options")
     args.add_argument(
-        "-d",
-        "--destination",
+        "-p",
+        "--path",
         metavar="PATH",
         type=str,
         default=str(os.path.join(pathlib.Path().resolve().absolute(), "Manga")),
@@ -78,9 +78,9 @@ def _download_args(args_parser):
     )
     args.add_argument(
         "-svc",
-        "--selvolchap",
+        "--sel-vol-chap",
         type=str,
-        metavar="SELVOLCHAP",
+        metavar="SEL_VOL_CHAP",
         default=None,
         help=(
             "Select chapters to be downloaded can be singles separated by ','\n"
@@ -94,21 +94,21 @@ def _download_args(args_parser):
         ),
     )
     args.add_argument(
-        "--alttitle-lang",
+        "--alt-title-lang",
         type=check_lang,
-        metavar="ALTTLANG",
+        metavar="ALT_TITLE_LANG",
         default=None,
         help="Specify the language in we should get the alternative title.\n"
              "Available alternative titles can be seen to the left of the chapters of the manga on the site.\n",
     )
     args.add_argument(
-        "--deftitle",
-        action="store_false",
-        default=True,
-        help="Whether or not to use the default title of the manga.\n"
-             "Aka the one that appears on the site/url.\n"
-             "Note: this argument precedes the one of the alternative title in importance.\n"
-             "By which i mean that if this argument is not used the program will get the default title even if"
+        "--use-alt-title",
+        action="store_true",
+        default=False,
+        help="Whether or not to use the alternative title of the manga.\n"
+             "Aka the one that appears to the side of the chapters on the site.\n"
+             "Note: this argument can be used with --alt-title-lang to change the language of the alt title.\n"
+             "If this argument is not used the program will get the default title even if"
              "the --alttitle-lang is used.\n",
     )
     args.add_argument(

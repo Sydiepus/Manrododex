@@ -38,16 +38,16 @@ def cli_handler():
         return
     if not args.dry_run:
         logger.init(args.log_level)
-    title_settings = (args.name, args.alttitle_lang, args.deftitle)
+    title_settings = (args.name, args.alttitle_lang, not args.use_alt_title)
     if len(sys.argv) <= 1:
         parser.print_help()
     else:
         if args.File is None:
-            main(args.url_uuid, title_settings, args.language, args.selvolchap, args.destination, args.data_saver,
+            main(args.url_uuid, title_settings, args.language, args.sel_vol_chap, args.path, args.data_saver,
                  args.threads,
                  args.force_ssl, args.zip_format, args.dry_run)
         else:
-            file_main(args.File, title_settings, args.language, args.selvolchap, args.destination, args.data_saver,
+            file_main(args.File, title_settings, args.language, args.sel_vol_chap, args.path, args.data_saver,
                       args.threads,
                       args.force_ssl, args.zip_format, args.dry_run)
 
