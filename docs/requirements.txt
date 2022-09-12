@@ -1,0 +1,5 @@
+setuptools_scm
+sphinx
+sphinx_rtd_theme
+sphinx-argparse
+sphinxcontrib-napoleon
