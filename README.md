@@ -7,6 +7,7 @@
 ![](https://img.shields.io/pypi/pyversions/manrododex)
 ![GitHub Workflow Status](https://github.com/Sydiepus/Manrododex/actions/workflows/CI.yml/badge.svg)
 ![PyPI](https://img.shields.io/pypi/v/manrododex)
+[![Documentation Status](https://readthedocs.org/projects/manrododex/badge/?version=latest)](https://manrododex.readthedocs.io/en/latest/?badge=latest)
 ## Features
 
 - Threads support for faster downloads.
