@@ -38,7 +38,7 @@ def cli_handler():
         return
     if not args.dry_run:
         logger.init(args.log_level)
-    title_settings = (args.name, args.alttitle_lang, not args.use_alt_title)
+    title_settings = (args.name, args.alt_title_lang, not args.use_alt_title)
     if len(sys.argv) <= 1:
         parser.print_help()
     else:
