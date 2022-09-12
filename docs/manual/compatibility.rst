@@ -1,5 +1,5 @@
 =============
-compatibility
+Compatibility
 =============
 
 Python interpreters

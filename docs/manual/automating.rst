@@ -22,4 +22,4 @@ Using a file to download
     3f28c47a-bf8d-4e79-83ca-2e64fe906372,,jp
 
 - When no language is given english is going to be used.
-- When no custom name is given the default title (the one that appears on the site) will be used unless specified otherwise with the ``--deftitle``
+- When no custom name is given the default title (the one that appears on the site) will be used unless specified otherwise with the ``--use-alt-title``
