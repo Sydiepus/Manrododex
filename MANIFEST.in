@@ -1,3 +1,6 @@
 include LICENSE
-include README.md
+include README.rst
 include MANIFEST.in
+prune test
+prune docs
+prune .github
