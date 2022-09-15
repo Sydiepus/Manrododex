@@ -10,8 +10,8 @@ Features
 - Threads support for faster downloads.
 - Uses queue for safe threading and better memory usage.
 - Creates a series.json file like mylar. (
-  see `here <https://komga.org/guides/scan-analysis-refresh.html#import-metadata-generated-by-mylar>`_
-  and `here <https://github.com/mylar3/mylar3/wiki/series.json-examples>`_ )
+  see `Komga <https://komga.org/guides/scan-analysis-refresh.html#import-metadata-generated-by-mylar>`_
+  and `mylar3 <https://github.com/mylar3/mylar3/wiki/series.json-examples>`_ )
 - Can be used to automate the download of manga in combination with crontabs/Scheduled Tasks.
 - Manrododex makes it possible to download multiple manga with little to user interaction.
 - A possibly wrong Japanese translation of the name.
