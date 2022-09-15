@@ -32,7 +32,7 @@ Maintainer
 
 `@Sydiepus <https://github.com/Sydiepus>`_ GPG: ``BD1D 09DF 8A49 E7A6 C705 3B8A 7D6C DB7E 575A C12A``
 
-.. |logo| image:: ./logo.gif
+.. |logo| image:: https://raw.githubusercontent.com/Sydiepus/Manrododex/main/logo.gif
     :target: https://manrododex.readthedocs.io/en/latest/
 .. |license| image:: https://img.shields.io/github/license/Sydiepus/Manrododex.svg
     :target: https://github.com/Sydiepus/Manrododex/blob/main/LICENSE

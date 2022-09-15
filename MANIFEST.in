@@ -4,3 +4,4 @@ include MANIFEST.in
 prune test
 prune docs
 prune .github
+exclude logo.gif
